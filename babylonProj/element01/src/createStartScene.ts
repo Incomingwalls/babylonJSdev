@@ -15,18 +15,53 @@ import {
     StandardMaterial,
     Texture,
     SpotLight,
+    ShadowGenerator,
+    PointLight,
+    Space,
+    PolyhedronData,
+    TorusBlock,
+    CreatePolyhedron,
   } from "@babylonjs/core";
   
   
-  function createBox(scene: Scene, px: number, py: number, pz: number, sx: number, sy: number, sz: number) {
+  function createBox(scene: Scene, px: number, py: number, pz: number, sx: number, sy: number, sz: number, rotation: boolean) {
     let box = MeshBuilder.CreateBox("box",{size: 1}, scene);
     box.position = new Vector3(px, py, pz);
     box.scaling = new Vector3(sx, sy, sz);
     //box.position.y = 3;
+
+    if (rotation) {
+      scene.registerAfterRender(function () {
+        box.rotate(new Vector3(4, 6, 2), 0.02, Space.LOCAL);
+      });
+    }
+
+
+
     return box;
   }
 
-  function createFacedBox(scene: Scene, px: number, py: number, pz: number) {
+  function createTorus(scene: Scene, px: number, py: number, pz: number) {
+    const torus = MeshBuilder.CreateTorus("torus", {});
+    torus.position = new Vector3(px, py, pz);
+    scene.registerAfterRender(function () {
+      torus.rotate(new Vector3(5, 5, 5), 0.02, Space.LOCAL);
+    });
+    return torus;
+  }
+
+  function createPolyhedra(scene: Scene, t: number, s: number, px: number, py: number, pz: number) {
+    const polyhedra = MeshBuilder.CreatePolyhedron("shape", {type: t, size: s}, scene);
+    polyhedra.position = new Vector3(px, py, pz);
+    scene.registerAfterRender(function () {
+      polyhedra.rotate(new Vector3( -3, 5, -3), 0.02, Space.LOCAL);
+    });
+    return polyhedra;
+ 
+
+  }
+
+  function createFacedBox(scene: Scene, px: number, py: number, pz: number, rotation: boolean) {
     const mat = new StandardMaterial("mat");
     const texture = new Texture("https://assets.babylonjs.com/environments/numbers.jpg");
     mat.diffuseTexture = texture;
@@ -48,6 +83,12 @@ import {
     let box = MeshBuilder.CreateBox("tiledBox", options,scene);
     box.material = mat;
     box.position = new Vector3(px, py, pz);
+
+    if (rotation) {
+      scene.registerAfterRender(function () {
+        box.rotate(new Vector3(1, 10, 4), 0.02, Space.LOCAL);
+      });
+    }
     return box;
   }
  
@@ -107,6 +148,8 @@ import {
     interface SceneData {
       scene: Scene;
       box?: Mesh;
+      torus?: Mesh;
+      polyhedra?: Mesh;
       faceBox?: Mesh;
       light?: Light;
       spotlight?: SpotLight;
@@ -119,8 +162,10 @@ import {
     that.scene.debugLayer.show();
   
     //create box (scene, posx, posy, posz, scalex, scaley, scalez)
-    that.box = createBox(that.scene, 2, 5, 3, 3, 2, 1);
-    that.faceBox = createFacedBox(that.scene, 6, 2, 8)
+    that.box = createBox(that.scene, 4, 3, 3, 3, 2, 1, true);
+    that.faceBox = createFacedBox(that.scene, 6, 2, 8, true)
+    that.torus = createTorus(that.scene, -4, 7, 7)
+    that.polyhedra = createPolyhedra(that.scene, 1, 4, 4, 10, 4)
     that.light = createLight(that.scene);
     that.spotlight = createSpotlight(that.scene, 0, 5, 0);
     that.sphere = createSphere(that.scene);
