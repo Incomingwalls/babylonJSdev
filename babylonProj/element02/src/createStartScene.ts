@@ -99,9 +99,13 @@ import {
 
   function createBox (scene: Scene){
     const boxMat = new StandardMaterial("boxMat");
-    boxMat.diffuseTexture = new Texture("https://www.babylonjs-playground.com/textures/floor.png");
-   
-    const box = MeshBuilder.CreateBox("box", {});
+    boxMat.diffuseTexture = new Texture("https://assets.babylonjs.com/environments/cubehouse.png");
+    const faceUV: Vector4 [] = [];
+    faceUV[0] = new Vector4(0.5, 0.0, 0.75, 1.0); //rear face
+    faceUV[1] = new Vector4(0.0, 0.0, 0.25, 1.0); //front face
+    faceUV[2] = new Vector4(0.25, 0, 0.5, 1.0); //right side
+    faceUV[3] = new Vector4(0.75, 0, 1.0, 1.0); //left side
+    const box = MeshBuilder.CreateBox("box", {faceUV: faceUV, wrap: true});
     box.position.y = 0.5;
     box.material = boxMat;
     return box;
@@ -116,6 +120,16 @@ import {
     roof.position.y = 1.22;
     roof.material = roofMat;
     return roof;
+
+
+  }
+
+  function createHouse(scene: Scene) {
+    const box = createBox(scene);
+    const roof = createRoof(scene);
+    const house = Mesh.MergeMeshes([box, roof]);
+    return house;
+
 
 
   }
@@ -164,6 +178,7 @@ import {
       trees?: SpriteManager;
       ufo?: SpriteManager;
       roof?: Mesh;
+      house?: Mesh;
     }
   
     let that: SceneData = { scene: new Scene(engine) };
@@ -179,6 +194,9 @@ import {
     that.ufo = createUfo(that.scene);
     that.roof = createRoof(that.scene);
     that.box = createBox(that.scene);
+    //const house = Mesh.MergeMeshes([that.box, that.roof]);
+    
+    //
   
     return that;
   }
