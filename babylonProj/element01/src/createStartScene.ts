@@ -101,9 +101,20 @@ import {
   }
 
   function createSpotlight(scene: Scene, px: number, py: number, pz: number) {
-    var light = new SpotLight("spotLight", new Vector3(0, 30, -10), new Vector3(0, -1, 0), Math.PI / 3, 2, scene);
-    light.diffuse = new Color3(0.04, 0.88, 0.15);
-    light.specular = new Color3(0.2, 0.13, 0.36);
+    //Light direction is directly down from a position one unit up, slow decay
+	var light = new SpotLight("spotLight", new Vector3(-1, 10, 1), new Vector3(4, -6, -3), Math.PI / 2, 10, scene);
+	light.diffuse = new Color3(1, 0, 0);
+	light.specular = new Color3(1, 0, 0);
+	
+	//Light direction is directly down from a position one unit up, fast decay
+	var light1 = new SpotLight("spotLight1", new Vector3(-1, 10, -1), new Vector3(4, -6, 3), Math.PI / 2, 10, scene);
+	light1.diffuse = new Color3(1, 1, 0);
+	light1.specular = new Color3(1, 1, 0);
+
+    //Light direction is directly down from a position one unit up, fast decay
+	var light1 = new SpotLight("spotLight2", new Vector3(1, 10, -.5), new Vector3(-4, -6, 3), Math.PI / 2, 10, scene);
+	light1.diffuse = new Color3(0, 0, 1);
+	light1.specular = new Color3(0, 0, 1);
     return light;
 
   }
@@ -156,6 +167,7 @@ import {
       sphere?: Mesh;
       ground?: Mesh;
       camera?: Camera;
+
     }
   
     let that: SceneData = { scene: new Scene(engine) };
