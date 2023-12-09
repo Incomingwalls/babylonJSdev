@@ -35,6 +35,8 @@ import {
         box.rotate(new Vector3(4, 6, 2), 0.02, Space.LOCAL);
       });
     }
+    box.receiveShadows = true;
+    box.position.x = px;
 
 
 
@@ -46,9 +48,15 @@ import {
     torus.position = new Vector3(px, py, pz);
     scene.registerAfterRender(function () {
       torus.rotate(new Vector3(5, 5, 5), 0.02, Space.LOCAL);
+      
     });
+    torus.receiveShadows = true;
+    torus.position.x = px;
     return torus;
   }
+
+
+
 
   function createPolyhedra(scene: Scene, t: number, s: number, px: number, py: number, pz: number) {
     const polyhedra = MeshBuilder.CreatePolyhedron("shape", {type: t, size: s}, scene);
@@ -56,6 +64,9 @@ import {
     scene.registerAfterRender(function () {
       polyhedra.rotate(new Vector3( -3, 5, -3), 0.02, Space.LOCAL);
     });
+
+    polyhedra.receiveShadows = true;
+    polyhedra.position.x = px;
     return polyhedra;
  
 
@@ -88,11 +99,37 @@ import {
       scene.registerAfterRender(function () {
         box.rotate(new Vector3(1, 10, 4), 0.02, Space.LOCAL);
       });
+      
     }
     return box;
   }
  
-
+  function createAnyLight(scene: Scene, index: number, px: number, py: number, pz: number, colX: number, colY: number, colZ: number, mesh: Mesh) {
+    // only spotlight, point and directional can cast shadows in BabylonJS
+    switch (index) {
+      case 1: //hemispheric light
+        const hemiLight = new HemisphericLight("hemiLight", new Vector3(px, py, pz), scene);
+        hemiLight.intensity = 0.1;
+        return hemiLight;
+        break;
+      case 2: //spot light
+        const spotLight = new SpotLight("spotLight", new Vector3(px, py, pz), new Vector3(0, -1, 0), Math.PI / 3, 10, scene);
+        spotLight.diffuse = new Color3(colX, colY, colZ); //0.39, 0.44, 0.91
+        let shadowGenerator = new ShadowGenerator(1024, spotLight);
+        shadowGenerator.addShadowCaster(mesh);
+        shadowGenerator.useExponentialShadowMap = true;
+        return spotLight;
+        break;
+      case 3: //point light
+        const pointLight = new PointLight("pointLight", new Vector3(px, py, pz), scene);
+        pointLight.diffuse = new Color3(colX, colY, colZ); //0.39, 0.44, 0.91
+        shadowGenerator = new ShadowGenerator(1024, pointLight);
+        shadowGenerator.addShadowCaster(mesh);
+        shadowGenerator.useExponentialShadowMap = true;
+        return pointLight;
+        break;
+    }
+  }
   
   function createLight(scene: Scene) {
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
@@ -105,6 +142,8 @@ import {
 	var light = new SpotLight("spotLight", new Vector3(-1, 10, 1), new Vector3(4, -6, -3), Math.PI / 2, 10, scene);
 	light.diffuse = new Color3(1, 0, 0);
 	light.specular = new Color3(1, 0, 0);
+  
+
 	
 	//Light direction is directly down from a position one unit up, fast decay
 	var light1 = new SpotLight("spotLight1", new Vector3(-1, 10, -1), new Vector3(4, -6, 3), Math.PI / 2, 10, scene);
@@ -119,12 +158,14 @@ import {
 
   }
   
+  
   function createSphere(scene: Scene) {
     let sphere = MeshBuilder.CreateSphere(
       "sphere",
       { diameter: 2, segments: 32 },
       scene,
     );
+    sphere.receiveShadows = true;
     sphere.position.y = 1;
     return sphere;
   }
@@ -132,9 +173,10 @@ import {
   function createGround(scene: Scene) {
     let ground = MeshBuilder.CreateGround(
       "ground",
-      { width: 40, height: 40 },
+      { width: 60, height: 60 },
       scene,
     );
+    ground.receiveShadows = true
     return ground;
   }
   
@@ -183,6 +225,7 @@ import {
     that.sphere = createSphere(that.scene);
     that.ground = createGround(that.scene);
     that.camera = createArcRotateCamera(that.scene);
+
   
     return that;
   }
