@@ -164,6 +164,7 @@ import {
   function createGround(scene: Scene) {
     const ground: Mesh = MeshBuilder.CreateGround("ground", {height: 10, width: 10, subdivisions: 4});
     const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
+    ground.receiveShadows = true;
     return ground;
   }
 
@@ -217,13 +218,12 @@ import {
     return light;
   }
 
-  //PREVIOUS METHODS
-  // function createSpotLight(scene: Scene, px: number, py: number, pz: number) {
-  //   var light = new SpotLight("spotLight", new Vector3(-1, 1, -1), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-  //   light.diffuse = new Color3(0.39, 0.44, 0.91);
-	//   light.specular = new Color3(0.22, 0.31, 0.79);
-  //   return light;
-  // }
+  function createSpotLight(scene: Scene, px: number, py: number, pz: number) {
+    const light = new SpotLight("spotLight", new Vector3(px, py, pz), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+    light.diffuse = new Color3(0.39, 0.44, 0.91);
+	  light.specular = new Color3(0.22, 0.31, 0.79);
+    return light;
+  }
   
   function createArcRotateCamera(scene: Scene) {
     let camAlpha = -Math.PI / 2,
@@ -254,6 +254,7 @@ import {
       actionManager?: any;
       skybox?: Mesh;
       light?: Light;
+      spotLight?: SpotLight;
       hemisphericLight?: HemisphericLight;
       camera?: Camera;
     }
@@ -274,7 +275,12 @@ import {
     that.skybox = createSkybox(that.scene);
     //Scene Lighting & Camera
     that.hemisphericLight = createHemiLight(that.scene);
+    that.spotLight = createSpotLight(that.scene, 2, 5, 2);
     that.camera = createArcRotateCamera(that.scene);
+
+    let shadowGenerator = new ShadowGenerator(1024, that.spotLight);
+    shadowGenerator.addShadowCaster(that.box);
+    shadowGenerator.useExponentialShadowMap = true;
     return that;
   }
   //----------------------------------------------------
