@@ -28,6 +28,7 @@ import {
     ActionManager,
     ExecuteCodeAction,
     AnimationPropertiesOverride,
+
   } from "@babylonjs/core";
   import HavokPhysics from "@babylonjs/havok";
   import { HavokPlugin, PhysicsAggregate, PhysicsShapeType } from "@babylonjs/core";
@@ -262,7 +263,7 @@ import {
     //----------------------------------------------------------
 
     //any further code goes here-----------
-    that.box = createBox(that.scene, 2, 2, 2);
+    that.box = createBox(that.scene, 6, 3, 3);
     that.ground = createGround(that.scene);
 
     that.importMesh = importPlayerMesh(that.scene, that.box, 0, 0);
